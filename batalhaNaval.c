@@ -1,425 +1,426 @@
 #include <stdio.h>
 
+#define TAM 10
+#define TAM_HABILIDADE 5
+#define TAM_NAVIO 3
+
 int main() {
 
-    /*
-    ============================================================
-             BATALHA NAVAL - NÍVEL AVENTUREIRO
-    ============================================================
-
-    Objetivo:
-    - Criar um tabuleiro 10x10.
-    - Inicializar todas as posições com 0 (água).
-    - Posicionar quatro navios de tamanho 3.
-    - Um navio horizontal.
-    - Um navio vertical.
-    - Dois navios diagonais.
-    - Representar os navios pelo valor 3.
-    - Validar os limites do tabuleiro.
-    - Evitar sobreposição entre os navios.
-    - Exibir o tabuleiro completo.
-
-    Representação:
-        0 = Água
-        3 = Navio
-    ============================================================
-    */
-
-
-    // ========================================================
-    // CONSTANTES
-    // ========================================================
-
-    // O tabuleiro possui 10 linhas e 10 colunas.
-    const int TAMANHO_TABULEIRO = 10;
-
-    // Todos os navios possuem tamanho 3.
-    const int TAMANHO_NAVIO = 3;
-
-
-    // ========================================================
+    // ============================================================
     // DECLARAÇÃO DO TABULEIRO
-    // ========================================================
+    // ============================================================
+    // O tabuleiro possui 10 linhas e 10 colunas.
+    //
+    // Valores utilizados:
+    // 0 = Água
+    // 3 = Navio
+    // 5 = Área afetada por habilidade
+    // ============================================================
 
-    // Matriz bidimensional utilizada para representar
-    // o tabuleiro da Batalha Naval.
-    int tabuleiro[10][10];
-
-
-    // ========================================================
-    // DECLARAÇÃO DOS NAVIOS
-    // ========================================================
-
-    /*
-    Cada navio é representado por um vetor.
-
-    Cada posição possui o valor 3, que será posteriormente
-    copiado para a matriz do tabuleiro.
-    */
-
-    int navioHorizontal[3] = {3, 3, 3};
-    int navioVertical[3] = {3, 3, 3};
-    int navioDiagonal1[3] = {3, 3, 3};
-    int navioDiagonal2[3] = {3, 3, 3};
+    int tabuleiro[TAM][TAM];
 
 
-    // ========================================================
-    // COORDENADAS DOS NAVIOS
-    // ========================================================
+    // ============================================================
+    // MATRIZES DAS HABILIDADES
+    // ============================================================
+    // Cada habilidade utiliza uma matriz 5x5.
+    //
+    // 0 = posição não afetada
+    // 1 = posição afetada
+    // ============================================================
 
-    /*
-    NAVIO HORIZONTAL
-
-    Começa em:
-        linha 1
-        coluna 1
-
-    Ocupa:
-        [1][1]
-        [1][2]
-        [1][3]
-    */
-
-    int linhaHorizontal = 1;
-    int colunaHorizontal = 1;
+    int cone[TAM_HABILIDADE][TAM_HABILIDADE];
+    int cruz[TAM_HABILIDADE][TAM_HABILIDADE];
+    int octaedro[TAM_HABILIDADE][TAM_HABILIDADE];
 
 
-    /*
-    NAVIO VERTICAL
-
-    Começa em:
-        linha 4
-        coluna 8
-
-    Ocupa:
-        [4][8]
-        [5][8]
-        [6][8]
-    */
-
-    int linhaVertical = 4;
-    int colunaVertical = 8;
-
-
-    /*
-    NAVIO DIAGONAL 1
-
-    Linha e coluna aumentam simultaneamente.
-
-    Começa em:
-        linha 3
-        coluna 2
-
-    Ocupa:
-        [3][2]
-        [4][3]
-        [5][4]
-    */
-
-    int linhaDiagonal1 = 3;
-    int colunaDiagonal1 = 2;
-
-
-    /*
-    NAVIO DIAGONAL 2
-
-    A linha aumenta enquanto a coluna diminui.
-
-    Começa em:
-        linha 6
-        coluna 6
-
-    Ocupa:
-        [6][6]
-        [7][5]
-        [8][4]
-    */
-
-    int linhaDiagonal2 = 6;
-    int colunaDiagonal2 = 6;
-
-
-    // ========================================================
+    // ============================================================
     // VARIÁVEIS AUXILIARES
-    // ========================================================
+    // ============================================================
 
     int linha;
     int coluna;
     int i;
 
-    /*
-    Esta variável será utilizada durante as validações.
 
-    1 = posição válida
-    0 = posição inválida
-    */
-
-    int posicaoValida;
-
-
-    // ========================================================
+    // ============================================================
     // INICIALIZAÇÃO DO TABULEIRO
-    // ========================================================
+    // ============================================================
+    // Percorremos todas as posições da matriz utilizando dois
+    // loops aninhados e colocamos o valor 0, representando água.
+    // ============================================================
 
-    /*
-    Dois loops aninhados percorrem toda a matriz.
+    for (linha = 0; linha < TAM; linha++) {
 
-    Todas as posições recebem inicialmente o valor 0,
-    representando a água.
-    */
-
-    for (linha = 0; linha < TAMANHO_TABULEIRO; linha++) {
-
-        for (coluna = 0; coluna < TAMANHO_TABULEIRO; coluna++) {
+        for (coluna = 0; coluna < TAM; coluna++) {
 
             tabuleiro[linha][coluna] = 0;
         }
     }
 
 
-    // ========================================================
-    // NAVIO HORIZONTAL
-    // ========================================================
+    // ============================================================
+    // POSICIONAMENTO DOS NAVIOS
+    // ============================================================
+    // Mantemos quatro navios do nível aventureiro:
+    //
+    // 1 - Horizontal
+    // 2 - Vertical
+    // 3 - Diagonal principal
+    // 4 - Diagonal secundária
+    //
+    // Cada navio ocupa três posições.
+    // ============================================================
 
-    posicaoValida = 1;
 
-    /*
-    Verifica se o navio horizontal ficará completamente
-    dentro dos limites do tabuleiro.
-    */
+    // ------------------------------------------------------------
+    // NAVIO 1 - HORIZONTAL
+    // ------------------------------------------------------------
+    // Começa na linha 1 e coluna 0.
+    // A linha permanece fixa e a coluna aumenta.
+    // ------------------------------------------------------------
 
-    if (linhaHorizontal < 0 ||
-        linhaHorizontal >= TAMANHO_TABULEIRO ||
-        colunaHorizontal < 0 ||
-        colunaHorizontal + TAMANHO_NAVIO > TAMANHO_TABULEIRO) {
+    int linhaHorizontal = 1;
+    int colunaHorizontal = 0;
 
-        printf("Erro: Navio horizontal fora do tabuleiro.\n");
+    for (i = 0; i < TAM_NAVIO; i++) {
 
-        posicaoValida = 0;
+        tabuleiro[linhaHorizontal][colunaHorizontal + i] = 3;
     }
 
 
-    /*
-    Verifica se as posições que serão ocupadas estão livres.
-    */
+    // ------------------------------------------------------------
+    // NAVIO 2 - VERTICAL
+    // ------------------------------------------------------------
+    // Começa na linha 3 e coluna 2.
+    // A coluna permanece fixa e a linha aumenta.
+    // ------------------------------------------------------------
 
-    if (posicaoValida == 1) {
+    int linhaVertical = 3;
+    int colunaVertical = 2;
 
-        for (i = 0; i < TAMANHO_NAVIO; i++) {
+    for (i = 0; i < TAM_NAVIO; i++) {
 
-            if (tabuleiro[linhaHorizontal][colunaHorizontal + i] != 0) {
+        tabuleiro[linhaVertical + i][colunaVertical] = 3;
+    }
 
-                printf("Erro: Sobreposicao no navio horizontal.\n");
 
-                posicaoValida = 0;
+    // ------------------------------------------------------------
+    // NAVIO 3 - DIAGONAL PRINCIPAL
+    // ------------------------------------------------------------
+    // Linha e coluna aumentam simultaneamente.
+    // ------------------------------------------------------------
+
+    int linhaDiagonal1 = 4;
+    int colunaDiagonal1 = 3;
+
+    for (i = 0; i < TAM_NAVIO; i++) {
+
+        tabuleiro[linhaDiagonal1 + i][colunaDiagonal1 + i] = 3;
+    }
+
+
+    // ------------------------------------------------------------
+    // NAVIO 4 - DIAGONAL SECUNDÁRIA
+    // ------------------------------------------------------------
+    // A linha aumenta enquanto a coluna diminui.
+    // ------------------------------------------------------------
+
+    int linhaDiagonal2 = 4;
+    int colunaDiagonal2 = 7;
+
+    for (i = 0; i < TAM_NAVIO; i++) {
+
+        tabuleiro[linhaDiagonal2 + i][colunaDiagonal2 - i] = 3;
+    }
+
+
+    // ============================================================
+    // CRIAÇÃO DA MATRIZ DA HABILIDADE CONE
+    // ============================================================
+    //
+    // O cone começa estreito na parte superior e vai aumentando
+    // em direção à parte inferior.
+    //
+    // Exemplo aproximado:
+    //
+    // 0 0 1 0 0
+    // 0 1 1 1 0
+    // 1 1 1 1 1
+    // 0 0 0 0 0
+    // 0 0 0 0 0
+    //
+    // A construção é realizada dinamicamente utilizando
+    // condicionais dentro de loops aninhados.
+    // ============================================================
+
+    for (linha = 0; linha < TAM_HABILIDADE; linha++) {
+
+        for (coluna = 0; coluna < TAM_HABILIDADE; coluna++) {
+
+            if (
+                (linha == 0 && coluna == 2) ||
+                (linha == 1 && coluna >= 1 && coluna <= 3) ||
+                (linha == 2)
+            ) {
+                cone[linha][coluna] = 1;
+            }
+            else {
+                cone[linha][coluna] = 0;
             }
         }
     }
 
 
-    /*
-    Se tudo estiver correto, posicionamos o navio.
-    */
+    // ============================================================
+    // CRIAÇÃO DA MATRIZ DA HABILIDADE CRUZ
+    // ============================================================
+    //
+    // A cruz possui uma linha horizontal e uma linha vertical
+    // passando pelo centro da matriz.
+    //
+    // Exemplo:
+    //
+    // 0 0 1 0 0
+    // 0 0 1 0 0
+    // 1 1 1 1 1
+    // 0 0 1 0 0
+    // 0 0 1 0 0
+    //
+    // O centro da matriz 5x5 é a posição [2][2].
+    // ============================================================
 
-    if (posicaoValida == 1) {
+    for (linha = 0; linha < TAM_HABILIDADE; linha++) {
 
-        for (i = 0; i < TAMANHO_NAVIO; i++) {
+        for (coluna = 0; coluna < TAM_HABILIDADE; coluna++) {
 
-            tabuleiro[linhaHorizontal][colunaHorizontal + i]
-                = navioHorizontal[i];
-        }
-    }
+            if (linha == 2 || coluna == 2) {
 
+                cruz[linha][coluna] = 1;
+            }
+            else {
 
-    // ========================================================
-    // NAVIO VERTICAL
-    // ========================================================
-
-    posicaoValida = 1;
-
-
-    /*
-    Para o navio vertical, a coluna permanece fixa enquanto
-    a linha aumenta.
-    */
-
-    if (linhaVertical < 0 ||
-        linhaVertical + TAMANHO_NAVIO > TAMANHO_TABULEIRO ||
-        colunaVertical < 0 ||
-        colunaVertical >= TAMANHO_TABULEIRO) {
-
-        printf("Erro: Navio vertical fora do tabuleiro.\n");
-
-        posicaoValida = 0;
-    }
-
-
-    // Verificação de sobreposição.
-    if (posicaoValida == 1) {
-
-        for (i = 0; i < TAMANHO_NAVIO; i++) {
-
-            if (tabuleiro[linhaVertical + i][colunaVertical] != 0) {
-
-                printf("Erro: Sobreposicao no navio vertical.\n");
-
-                posicaoValida = 0;
+                cruz[linha][coluna] = 0;
             }
         }
     }
 
 
-    // Posicionamento do navio vertical.
-    if (posicaoValida == 1) {
+    // ============================================================
+    // CRIAÇÃO DA MATRIZ DA HABILIDADE OCTAEDRO
+    // ============================================================
+    //
+    // Visto de frente, o octaedro possui formato semelhante
+    // a um losango.
+    //
+    // Exemplo:
+    //
+    // 0 0 1 0 0
+    // 0 1 1 1 0
+    // 1 1 1 1 1
+    // 0 1 1 1 0
+    // 0 0 1 0 0
+    //
+    // Utilizamos a distância da posição atual até o centro
+    // da matriz para determinar se ela pertence ao losango.
+    // ============================================================
 
-        for (i = 0; i < TAMANHO_NAVIO; i++) {
+    for (linha = 0; linha < TAM_HABILIDADE; linha++) {
 
-            tabuleiro[linhaVertical + i][colunaVertical]
-                = navioVertical[i];
-        }
-    }
+        for (coluna = 0; coluna < TAM_HABILIDADE; coluna++) {
 
+            int distanciaLinha = linha - 2;
+            int distanciaColuna = coluna - 2;
 
-    // ========================================================
-    // PRIMEIRO NAVIO DIAGONAL
-    // ========================================================
+            // Transformamos valores negativos em positivos.
+            if (distanciaLinha < 0) {
+                distanciaLinha = -distanciaLinha;
+            }
 
-    posicaoValida = 1;
+            if (distanciaColuna < 0) {
+                distanciaColuna = -distanciaColuna;
+            }
 
+            // Se a soma das distâncias for menor ou igual a 2,
+            // a posição faz parte do losango.
+            if (distanciaLinha + distanciaColuna <= 2) {
 
-    /*
-    Nesta diagonal, linha e coluna aumentam juntas.
+                octaedro[linha][coluna] = 1;
+            }
+            else {
 
-    Exemplo:
-
-        [3][2]
-        [4][3]
-        [5][4]
-
-    Portanto utilizamos:
-
-        linhaDiagonal1 + i
-        colunaDiagonal1 + i
-    */
-
-    if (linhaDiagonal1 < 0 ||
-        colunaDiagonal1 < 0 ||
-        linhaDiagonal1 + TAMANHO_NAVIO > TAMANHO_TABULEIRO ||
-        colunaDiagonal1 + TAMANHO_NAVIO > TAMANHO_TABULEIRO) {
-
-        printf("Erro: Navio diagonal 1 fora do tabuleiro.\n");
-
-        posicaoValida = 0;
-    }
-
-
-    // Verificação de sobreposição.
-    if (posicaoValida == 1) {
-
-        for (i = 0; i < TAMANHO_NAVIO; i++) {
-
-            if (tabuleiro[linhaDiagonal1 + i][colunaDiagonal1 + i] != 0) {
-
-                printf("Erro: Sobreposicao no navio diagonal 1.\n");
-
-                posicaoValida = 0;
+                octaedro[linha][coluna] = 0;
             }
         }
     }
 
 
-    // Posicionamento do primeiro navio diagonal.
-    if (posicaoValida == 1) {
+    // ============================================================
+    // POSIÇÕES DAS HABILIDADES NO TABULEIRO
+    // ============================================================
+    //
+    // Cada habilidade possui uma posição de origem.
+    // Essas posições são definidas diretamente no código,
+    // conforme permitido pelo desafio.
+    // ============================================================
 
-        for (i = 0; i < TAMANHO_NAVIO; i++) {
+    int origemConeLinha = 0;
+    int origemConeColuna = 7;
 
-            tabuleiro[linhaDiagonal1 + i][colunaDiagonal1 + i]
-                = navioDiagonal1[i];
-        }
-    }
+    int origemCruzLinha = 7;
+    int origemCruzColuna = 2;
 
-
-    // ========================================================
-    // SEGUNDO NAVIO DIAGONAL
-    // ========================================================
-
-    posicaoValida = 1;
-
-
-    /*
-    Neste navio diagonal:
-
-    - a linha aumenta;
-    - a coluna diminui.
-
-    Exemplo:
-
-        [6][6]
-        [7][5]
-        [8][4]
-
-    Portanto utilizamos:
-
-        linhaDiagonal2 + i
-        colunaDiagonal2 - i
-    */
-
-    if (linhaDiagonal2 < 0 ||
-        linhaDiagonal2 + TAMANHO_NAVIO > TAMANHO_TABULEIRO ||
-        colunaDiagonal2 >= TAMANHO_TABULEIRO ||
-        colunaDiagonal2 - (TAMANHO_NAVIO - 1) < 0) {
-
-        printf("Erro: Navio diagonal 2 fora do tabuleiro.\n");
-
-        posicaoValida = 0;
-    }
+    int origemOctaedroLinha = 7;
+    int origemOctaedroColuna = 7;
 
 
-    // Verificação de sobreposição.
-    if (posicaoValida == 1) {
+    // ============================================================
+    // SOBREPOSIÇÃO DA HABILIDADE CONE
+    // ============================================================
+    //
+    // Percorremos a matriz do cone.
+    //
+    // Quando encontramos valor 1, calculamos sua posição
+    // correspondente dentro do tabuleiro.
+    //
+    // Antes de alterar o tabuleiro, verificamos seus limites.
+    // ============================================================
 
-        for (i = 0; i < TAMANHO_NAVIO; i++) {
+    for (linha = 0; linha < TAM_HABILIDADE; linha++) {
 
-            if (tabuleiro[linhaDiagonal2 + i][colunaDiagonal2 - i] != 0) {
+        for (coluna = 0; coluna < TAM_HABILIDADE; coluna++) {
 
-                printf("Erro: Sobreposicao no navio diagonal 2.\n");
+            if (cone[linha][coluna] == 1) {
 
-                posicaoValida = 0;
+                int linhaTabuleiro = origemConeLinha + linha;
+                int colunaTabuleiro =
+                    origemConeColuna + coluna - 2;
+
+                // Verifica se a posição está dentro do tabuleiro.
+                if (
+                    linhaTabuleiro >= 0 &&
+                    linhaTabuleiro < TAM &&
+                    colunaTabuleiro >= 0 &&
+                    colunaTabuleiro < TAM
+                ) {
+
+                    // Não substituímos posições ocupadas por navios.
+                    if (tabuleiro[linhaTabuleiro][colunaTabuleiro] != 3) {
+
+                        tabuleiro[linhaTabuleiro][colunaTabuleiro] = 5;
+                    }
+                }
             }
         }
     }
 
 
-    // Posicionamento do segundo navio diagonal.
-    if (posicaoValida == 1) {
+    // ============================================================
+    // SOBREPOSIÇÃO DA HABILIDADE CRUZ
+    // ============================================================
 
-        for (i = 0; i < TAMANHO_NAVIO; i++) {
+    for (linha = 0; linha < TAM_HABILIDADE; linha++) {
 
-            tabuleiro[linhaDiagonal2 + i][colunaDiagonal2 - i]
-                = navioDiagonal2[i];
+        for (coluna = 0; coluna < TAM_HABILIDADE; coluna++) {
+
+            if (cruz[linha][coluna] == 1) {
+
+                int linhaTabuleiro =
+                    origemCruzLinha + linha - 2;
+
+                int colunaTabuleiro =
+                    origemCruzColuna + coluna - 2;
+
+                // Verifica os limites do tabuleiro.
+                if (
+                    linhaTabuleiro >= 0 &&
+                    linhaTabuleiro < TAM &&
+                    colunaTabuleiro >= 0 &&
+                    colunaTabuleiro < TAM
+                ) {
+
+                    if (tabuleiro[linhaTabuleiro][colunaTabuleiro] != 3) {
+
+                        tabuleiro[linhaTabuleiro][colunaTabuleiro] = 5;
+                    }
+                }
+            }
         }
     }
 
 
-    // ========================================================
+    // ============================================================
+    // SOBREPOSIÇÃO DA HABILIDADE OCTAEDRO
+    // ============================================================
+
+    for (linha = 0; linha < TAM_HABILIDADE; linha++) {
+
+        for (coluna = 0; coluna < TAM_HABILIDADE; coluna++) {
+
+            if (octaedro[linha][coluna] == 1) {
+
+                int linhaTabuleiro =
+                    origemOctaedroLinha + linha - 2;
+
+                int colunaTabuleiro =
+                    origemOctaedroColuna + coluna - 2;
+
+                // Verifica os limites antes de acessar a matriz.
+                if (
+                    linhaTabuleiro >= 0 &&
+                    linhaTabuleiro < TAM &&
+                    colunaTabuleiro >= 0 &&
+                    colunaTabuleiro < TAM
+                ) {
+
+                    if (tabuleiro[linhaTabuleiro][colunaTabuleiro] != 3) {
+
+                        tabuleiro[linhaTabuleiro][colunaTabuleiro] = 5;
+                    }
+                }
+            }
+        }
+    }
+
+
+    // ============================================================
     // EXIBIÇÃO DO TABULEIRO
-    // ========================================================
+    // ============================================================
 
-    printf("\n=======================================\n");
-    printf("       BATALHA NAVAL - TABULEIRO\n");
-    printf("=======================================\n\n");
+    printf("\n========================================\n");
+    printf("       BATALHA NAVAL - NIVEL MESTRE\n");
+    printf("========================================\n\n");
 
-    printf("Legenda: 0 = Agua | 3 = Navio\n\n");
+    printf("Legenda:\n");
+    printf("0 = Agua\n");
+    printf("3 = Navio\n");
+    printf("5 = Area afetada pela habilidade\n\n");
 
 
-    /*
-    Os loops aninhados percorrem todas as posições da matriz
-    para exibir o tabuleiro completo.
-    */
+    // ------------------------------------------------------------
+    // Cabeçalho das colunas
+    // ------------------------------------------------------------
 
-    for (linha = 0; linha < TAMANHO_TABULEIRO; linha++) {
+    printf("   ");
 
-        for (coluna = 0; coluna < TAMANHO_TABULEIRO; coluna++) {
+    for (coluna = 0; coluna < TAM; coluna++) {
+
+        printf("%d ", coluna);
+    }
+
+    printf("\n");
+
+
+    // ------------------------------------------------------------
+    // Exibição das linhas do tabuleiro
+    // ------------------------------------------------------------
+
+    for (linha = 0; linha < TAM; linha++) {
+
+        // Número da linha
+        printf("%d  ", linha);
+
+        for (coluna = 0; coluna < TAM; coluna++) {
 
             printf("%d ", tabuleiro[linha][coluna]);
         }
@@ -428,9 +429,9 @@ int main() {
     }
 
 
-    // ========================================================
-    // FIM DO PROGRAMA
-    // ========================================================
+    // ============================================================
+    // FINALIZAÇÃO DO PROGRAMA
+    // ============================================================
 
     return 0;
 }
